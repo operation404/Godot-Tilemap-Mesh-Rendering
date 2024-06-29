@@ -11,7 +11,7 @@ viewport_path = NodePath("SubViewport")
 size = Vector2i(2880, 1620)
 
 [node name="Root" parent="SubViewport" instance=ExtResource("1_do8ex")]
-scale = Vector2(3, 3)
+scale = Vector2(2.9, 2.9)
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 scale = Vector2(0.408642, 0.408642)
