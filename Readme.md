@@ -18,6 +18,8 @@ The same scene, but using a non-integer scale (2.9). Since the amount of pixels 
 
 https://github.com/operation404/Godot-Tilemap-Mesh-Rendering/assets/12285227/e0971477-f67a-4fea-96e0-88eca3789c21
 
+The example scenes in these videos are included in the repository.
+
 ## Specifics
 
 The following list is all the differences between this and the default tilemap rendering method.
