@@ -1,0 +1,141 @@
+#version 460 core
+
+/* NOTE
+    I am currently using c# code to take the contents of this file and make a
+    usable godot shader resource out of it. Godot requires an annotation be
+    included above glsl shaders to help it identify they are pure glsl, but
+    the glsl linter throws errors upon seeing that annotation since it's not
+    a defined one. This is a hacky workaround for my specific workflow.
+*/
+
+// Only 1 local invocation
+layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
+
+// ========================= Constants =========================
+
+const int MAX_USABLE_MIPMAPS = 9;
+
+// ========================= Uniforms =========================
+
+struct TileData
+{
+    ivec2 coord;
+    ivec2 atlas_size;
+};
+layout(set = 0, binding = 0, std430) restrict buffer tile_uniforms
+{
+    ivec2 region_size;
+    TileData tiles[];
+};
+
+layout(set = 0, binding = 1,
+       rgba32f) restrict coherent uniform image2D img[MAX_USABLE_MIPMAPS + 1];
+
+layout(set = 0, binding = 17) uniform sampler2D tex[MAX_USABLE_MIPMAPS + 1];
+
+// ========================= UV Converting =========================
+
+vec2 texel_to_uv(ivec2 texel_coord, ivec2 texture_size)
+{
+    vec2 texel_center = vec2(texel_coord) + vec2(0.5);
+    return texel_center / texture_size;
+}
+
+ivec2 uv_to_texel(vec2 uv, ivec2 texture_size)
+{
+    vec2 approx_texel = round(uv * texture_size - 0.5);
+    return ivec2(approx_texel);
+}
+
+// ========================= Mipmap Data =========================
+
+struct MipmapLevel
+{
+    int level;
+    ivec2 region_size;
+    ivec2 used_texture_dimensions;
+    ivec2 true_texture_dimensions;
+    vec2 dimensions_ratio;
+    ivec2 tile_offset;
+    ivec2 tile_size;
+};
+
+struct
+{
+    ivec2 tile_grid_dimensions;
+    MipmapLevel previous;
+    MipmapLevel current;
+} mip;
+
+void set_first_level_params()
+{
+    TileData tile = tiles[gl_WorkGroupID.x];
+    ivec2 image_size = imageSize(img[0]);
+
+    mip.tile_grid_dimensions = image_size / region_size;
+    mip.current.level = 0;
+    mip.current.region_size = region_size;
+    mip.current.used_texture_dimensions =
+        mip.tile_grid_dimensions * region_size;
+    mip.current.true_texture_dimensions = image_size;
+    mip.current.dimensions_ratio = vec2(mip.current.used_texture_dimensions) /
+                                   mip.current.true_texture_dimensions;
+    mip.current.tile_offset = tile.coord * mip.current.region_size;
+    mip.current.tile_size = tile.atlas_size = mip.current.region_size;
+}
+
+void calculate_next_level_params()
+{
+    TileData tile = tiles[gl_WorkGroupID.x];
+    mip.previous = mip.current;
+
+    mip.current.level += 1;
+    mip.current.region_size /= 2;
+    mip.current.used_texture_dimensions =
+        mip.tile_grid_dimensions * mip.current.region_size;
+    mip.current.true_texture_dimensions /= 2;
+    mip.current.dimensions_ratio = vec2(mip.current.used_texture_dimensions) /
+                                   mip.current.true_texture_dimensions;
+    mip.current.tile_offset = tile.coord * mip.current.region_size;
+    mip.current.tile_size = tile.atlas_size = mip.current.region_size;
+}
+
+// ========================= Mipmap Generation =========================
+
+vec4 get_color(vec2 uv)
+{
+    vec2 prev_uv = uv * mip.previous.dimensions_ratio;
+    vec4 color = texture(tex[mip.previous.level], prev_uv);
+    return color;
+}
+
+void generate_mipmap()
+{
+    // Loop through each texel of the tile's next mipmap region
+    for (int h = 0; h < mip.current.tile_size.y; h++)
+    {
+        for (int w = 0; w < mip.current.tile_size.x; w++)
+        {
+            ivec2 coord = mip.current.tile_offset + ivec2(w, h);
+
+            // UV is calculated from only the used area of the mipmap
+            vec2 uv = texel_to_uv(coord, mip.current.used_texture_dimensions);
+
+            imageStore(img[mip.current.level], coord, get_color(uv));
+        }
+    }
+}
+
+// ========================= Main =========================
+
+void main()
+{
+    set_first_level_params();
+
+    while (mip.current.region_size.x > 1 && mip.current.region_size.y > 1)
+    {
+        calculate_next_level_params();
+        generate_mipmap();
+        // memoryBarrierImage();
+    }
+}

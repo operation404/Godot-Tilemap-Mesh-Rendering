@@ -1,0 +1,14 @@
+<Project Sdk="Godot.NET.Sdk/4.3.0-beta.2">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <CodeAnalysisRuleSet>d:\Projects and Repositories\Godot Projects\tilemap-render-demo\.vscode\ruleset.xml</CodeAnalysisRuleSet>
+    <TargetFramework Condition=" '$(GodotTargetPlatform)' == 'android' ">net7.0</TargetFramework>
+    <TargetFramework Condition=" '$(GodotTargetPlatform)' == 'ios' ">net8.0</TargetFramework>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <RootNamespace>TilemapRenderDemo</RootNamespace>
+  </PropertyGroup>
+    <ItemGroup>
+    <!-- Include used packages. -->
+    <PackageReference Include="CommunityToolkit.HighPerformance" Version="8.2.2" />
+  </ItemGroup>
+</Project>

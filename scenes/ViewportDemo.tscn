@@ -1,0 +1,19 @@
+[gd_scene load_steps=3 format=3 uid="uid://dvl8a6m0eclxq"]
+
+[ext_resource type="PackedScene" uid="uid://dlj0re1wurh8f" path="res://scenes/RenderDemo.tscn" id="1_do8ex"]
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_g1igj"]
+viewport_path = NodePath("SubViewport")
+
+[node name="ViewportDemo" type="Node2D"]
+
+[node name="SubViewport" type="SubViewport" parent="."]
+size = Vector2i(2880, 1620)
+
+[node name="Root" parent="SubViewport" instance=ExtResource("1_do8ex")]
+scale = Vector2(3, 3)
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.408642, 0.408642)
+texture = SubResource("ViewportTexture_g1igj")
+centered = false

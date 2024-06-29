@@ -2,3 +2,4 @@
 .godot/
 android/
 *.code-workspace
+.vscode/
