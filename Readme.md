@@ -20,6 +20,8 @@ The following list is all the differences between this and the default tilemap r
 
 When rendering a tilemap with this method and perfectly aligned to a grid as well as scaled such that each tile has the same number of pixels, this method should look no different than the default. The differences should only be noticeable when the tilemap is not perfectly aligned to the screen or is scaled/rotated.
 
+https://github.com/operation404/Godot-Tilemap-Mesh-Rendering/raw/master/videos/integer%20scaled.mp4
+
 ## What Is It
 
 The main files of interest are in the `source` directory. There are two C# classes for the node and a helper class, and two shaders.
