@@ -61,9 +61,6 @@ public abstract partial class TilemapDisplay : Node2D
     }
     private bool _useMipmaps = false;
 
-    [Export]
-    public TilemapDisplay PreviousLayer;
-
     #endregion
     #region  ========== Static ==========
 
