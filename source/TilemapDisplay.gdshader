@@ -17,6 +17,7 @@ const int INVALID_ATLAS_ID = MAX_SOURCES; // Different name for clearer intent
 uniform ivec2 tile_size = ivec2(1, 1); // Each side length must be >= 1
 uniform sampler2D map_data;
 uniform sampler2D atlas[MAX_SOURCES];
+uniform bool raw_in_instance_custom = true;
 
 #ifdef USE_MIPMAPS
 uniform float lod_bias = 0.0;
@@ -40,8 +41,9 @@ varying flat float used_mipmaps;
 
 void vertex()
 {
-    map_texel = floatBitsToInt(INSTANCE_CUSTOM.xy);
-    tile_scale = floatBitsToInt(INSTANCE_CUSTOM.zw);
+    vec4 raw_data = raw_in_instance_custom ? INSTANCE_CUSTOM : COLOR;
+    map_texel = floatBitsToInt(raw_data.xy);
+    tile_scale = floatBitsToInt(raw_data.zw);
     main_tile_size = tile_size * tile_scale;
 
 #ifdef USE_MIPMAPS

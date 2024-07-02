@@ -1,6 +1,6 @@
 # Non-Pixel Perfect Tilemap Rendering
 
-This project countains the sources for a new node and accompanying shaders that improve the visual clarity of tilemaps when used in non-pixel perfect projects. This node was originally created for pixel art games that didn't use pixel-perfect alignment, but it should provide some benefits for tilemaps with higher resolution art as well.
+This project countains the sources for new nodes and accompanying shaders that improve the visual clarity of tilemaps when used in non-pixel perfect projects. The nodes were originally created for pixel art games that didn't use pixel-perfect alignment, but it should provide some benefits for tilemaps with higher resolution art as well.
 
 This tool is still a work in progress, and while it is mostly finished, there are still a few improvements I'm working and likely some bugs to find and fix still.
 
@@ -32,13 +32,17 @@ The following list is all the differences between this and the default tilemap r
   - Godot has a texture import setting "Fix Alpha Border" that fixes this on non-atlas textures, but it produces visual artifacts on atlas textures due to lacking knowledge about which texture regions belong to which tile. This can result in colors bleeding in from neighboring tile regions.
 - If you choose to use mipmaps, the provided compute shader generates mipmaps for each tile in the atlas while ensuring it does not sampling outside a given tile's region, preventing color bleeding.
 
+When using these nodes, ensure that the tileset textures are imported with "Fix Alpha Border" off and use the compute shader to generate mipmaps if they are desired. Additionally, the shaders expect the texture origin to be in the top-left-most portion of tiles that happen to span more than a 1x1 area on the tileset atlas.
+
 ## Files and Classes
 
-The main files of interest are in the `source` directory. There are two C# classes for the node and a helper class, and two shaders.
+The relevant files are in the `source` directory. There are four C# classes for the nodes and a helper class, and two shaders.
 
-The `TilemapMeshDisplay` node has a `TileMapLayer` property which tells it what to display. The `TilemapMeshDisplay` does not replace the original `TileMapLayer`. I recommend assigning the `TileMapLayer` as a child of the `TilemapMeshDisplay` and disabling its visibility. This way you can still take advantage of the physics and other properties of the tilemap while using the mesh-based rendering.
+The `TilemapDisplay` node is an abstract class implemented by `TilemapMeshDisplay` and `TilemapCanvasItemDisplay`. These nodes have a `TileMapLayer` property which tells them what to display. They do not replace the original tilemap, they only render a copy of it. I recommend assigning the `TileMapLayer` node as a child of the display node and disabling its visibility. This way you can still take advantage of the physics and other properties of the tilemap while using the mesh-based rendering.
 
-The `TilemapMeshDisplay.gdshader` shader is used by the `TilemapMeshDisplay` node. The node will automatically create and set a material with this shader based on the properties of the tilemap and display nodes.
+The `TilemapMeshDisplay` node draws the tilemap using a multimesh, with each mesh instance representing one tile. Because multimeshes are drawn as a single primitive, they do not work as expected when Y-sort is enabled since the entire tilemap is a single canvas item. `TilemapCanvasItemDisplay` instead draws each tile as its own individual canvas item using the rendering server. Use this node if you need Y-sort enabled on the tilemap.
+
+The `TilemapDisplay.gdshader` shader is used by the display nodes. The node will automatically create and set a material with this shader based on the properties of the tilemap and display nodes.
 
 The `GenerateCustomTilesetMipmaps.comp` is a compute shader that generates tileset mipmaps while ensuring the different tile atlas regions do not bleed into each other. If you want to use mipmaps, you should generate them with this shader.
 
