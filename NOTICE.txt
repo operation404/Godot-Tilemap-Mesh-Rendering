@@ -1,0 +1,2 @@
+Non-Pixel-Perfect Tilemap Rendering
+Copyright 2024 Caelan Booker

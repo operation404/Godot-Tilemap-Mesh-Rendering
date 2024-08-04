@@ -1,4 +1,4 @@
-# Non-Pixel Perfect Tilemap Rendering
+# Non-Pixel-Perfect Tilemap Rendering
 
 This project countains the sources for new nodes and accompanying shaders that improve the visual clarity of tilemaps when used in non-pixel perfect projects. The nodes were originally created for pixel art games that didn't use pixel-perfect alignment, but it should provide some benefits for tilemaps with higher resolution art as well.
 
@@ -47,3 +47,9 @@ The `TilemapDisplay.gdshader` shader is used by the display nodes. The node will
 The `GenerateCustomTilesetMipmaps.comp` is a compute shader that generates tileset mipmaps while ensuring the different tile atlas regions do not bleed into each other. If you want to use mipmaps, you should generate them with this shader.
 
 The `TilesetHelper` class is a utility class with a few exposed public methods for taking in a `TileSetAtlasSource` and computing a new texture with mipmaps from the source's original texture. In order to use this, you must first set up the atlas source and properly define all of the tiles in the atlas texture. The shader only generates mipmaps for defined tiles, and needs to know where each tile is in order to avoid accidentally sampling from neighboring tile regions in order to prevent bleeding.
+
+## License
+
+The source code in this repository is under the [Apache 2.0 License](https://www.apache.org/licenses/LICENSE-2.0.txt). See `LICENSE` and `NOTICE` for additional details.
+
+Additionally, the example scenes in this repository use a tileset image (tileset/Standard Dungeon.png) originally authored by [0x72](https://0x72.itch.io/dungeontileset-ii) under the CC-0 license.
