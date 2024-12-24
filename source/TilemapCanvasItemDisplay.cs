@@ -1,3 +1,8 @@
+/*
+    Copyright 2024 Caelan Booker
+    Licensed under the Apache License, Version 2.0
+*/
+
 using Godot;
 using System;
 using System.Collections.Generic;
