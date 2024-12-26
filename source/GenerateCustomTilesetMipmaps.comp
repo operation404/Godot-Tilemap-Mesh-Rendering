@@ -1,6 +1,7 @@
 /*
-    Copyright 2024 Caelan Booker
+    Copyright 2024 "Lich" Caelan B.
     Licensed under the Apache License, Version 2.0
+    Repository: https://github.com/operation404/Godot-Tilemap-Mesh-Rendering
 */
 
 #version 460 core
